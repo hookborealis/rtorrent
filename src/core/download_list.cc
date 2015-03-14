@@ -182,7 +182,7 @@ DownloadList::insert(Download* download) {
   try {
     (*itr)->data()->slot_initial_hash()        = std::bind(&DownloadList::hash_done, this, download);
     (*itr)->data()->slot_download_done()       = std::bind(&DownloadList::received_finished, this, download);
-
+    (*itr)->data()->slot_chunk_done()           = std::bind(&DownloadList::chunk_done, this, download, std::placeholders::_1 );
     // This needs to be separated into two different calls to ensure
     // the download remains in the view.
     std::for_each(control->view_manager()->begin(), control->view_manager()->end(), std::bind2nd(std::mem_fun(&View::insert), download));
@@ -488,6 +488,11 @@ DownloadList::check_hash(Download* download) {
   } catch (torrent::local_error& e) {
     lt_log_print(torrent::LOG_TORRENT_ERROR, "Could not check hash: %s", e.what());
   }
+}
+void
+DownloadList::chunk_done(Download* download, void* chunk_address){
+  const torrent::chunk_info_result& info = torrent::chunk_list_address_info (chunk_address);
+  lt_log_print_info(torrent::LOG_TORRENT_INFO, download->info(), "download_list", (std::string("Chunk download done.") + std::to_string(info.chunk_index)).c_str());
 }
 
 void

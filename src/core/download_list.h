@@ -43,6 +43,7 @@
 
 namespace torrent {
   class HashString;
+  class ChunkHandle;
 }
 
 namespace core {
@@ -156,6 +157,7 @@ private:
   void operator = (const DownloadList&);
 
   void                hash_done(Download* d);
+  void                chunk_done(Download* d, void * chunk_address);
   void                hash_queue(Download* d, int type);
 
   inline void         check_contains(Download* d);
